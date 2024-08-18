@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<!-- Declara que este é um documento HTML5 -->
+<html lang="en">
+<!-- Início do documento HTML com o idioma definido como inglês -->
+
+<head>
+    <!-- Cabeçalho do documento, onde metadados são especificados -->
+    <meta charset="UTF-8">
+    <!-- Define a codificação de caracteres como UTF-8 para suportar caracteres especiais -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Configura o viewport para garantir a responsividade em dispositivos móveis -->
+    <title>Criando Formulário</title>
+    <!-- Define o título da página que aparecerá na aba do navegador -->
+</head>
+
+<body>
+    <!-- Início do corpo do documento, onde o conteúdo visível é colocado -->
+
+    <form id="meuFormulario" action="/acao" method="get">
+        <!-- Início do formulário, com o id "meuFormulario", que envia dados para "/acao" usando o método GET -->
+        <h1>Formulário</h1>
+        <!-- Título do formulário, exibido como um cabeçalho de nível 1 -->
+
+        <div>
+            <!-- Contêiner para agrupar o rótulo e o campo de entrada de texto -->
+            <label for="nome">Nome:</label>
+            <!-- Rótulo para o campo de nome, associado ao campo de entrada com id "nome" -->
+            <input type="text" id="nome" name="nome" required />
+            <!-- Campo de entrada de texto para o nome, com id e nome definidos como "nome". O campo é obrigatório -->
+        </div>
+
+        <div>
+            <!-- Outro contêiner para o rótulo e o campo de entrada de e-mail -->
+            <label for="email">Email:</label>
+            <!-- Rótulo para o campo de e-mail, associado ao campo de entrada com id "email" -->
+            <input type="text" id="email" name="email" required />
+            <!-- Campo de entrada de texto para o e-mail, com id e nome definidos como "email". Este campo também é obrigatório -->
+        </div>
+
+        <button type="submit">Enviar</button>
+        <!-- Botão para enviar o formulário. Ao clicar, o formulário é enviado ao servidor -->
+    </form>
+
+    <script src="script.js"></script>
+    <!-- Inclui um arquivo JavaScript externo chamado "script.js" para adicionar funcionalidades ao formulário -->
+</body>
+<!-- Fim do corpo do documento -->
+
+</html>
+<!-- Fim do documento HTML -->

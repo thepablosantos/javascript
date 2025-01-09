@@ -4,8 +4,18 @@ const cachorro = {
     },
     rosnar: function() {
         console.log("grrrrr");
+    },
+
+    setRaca: function(raca) {
+        this.raca = raca;
+    },
+
+    getRaca: function() {
+        return "A raça é " + this.raca;
     }
 }
 
-console.log(cachorro.uivar);
-console.log(cachorro.rosnar);
+cachorro.setRaca("Pastor Alemão");
+console.log(cachorro.raca);
+console.log(cachorro.getRaca());
+

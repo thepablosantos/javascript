@@ -10,4 +10,6 @@ if(pessoa === pessoa2) {
     console.log("É diferente");
 }
 
-console.log(pessoa != pessoa2);
+pessoa2.nome = "João";
+console.log(pessoa2.nome);
+console.log(pessoa == pessoa2);

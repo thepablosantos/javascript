@@ -1,57 +1,77 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Tic-Tac-Toe</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <meta charset="UTF-8" />
+  <title>Tic-Tac-Toe – Modern Look</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
-<body>
-  <header>
-    <h1>Tic-Tac-Toe</h1>
+<body class="dark-mode">
+  <header class="header">
+    <h1 class="logo">Tic-Tac-Toe</h1>
   </header>
 
   <main>
-    <!-- Tela inicial de escolha de modo -->
-    <section id="mode-selection" class="card">
+    <!-- Mode selection -->
+    <section id="mode-selection" class="card glassy">
       <h2>Choose your mode</h2>
       <div id="buttons-container">
-        <button id="two-players" class="btn">2 Players</button>
-        <button id="ai-players" class="btn">Play vs AI</button>
+        <button id="two-players" class="btn gradient-btn">2 Players</button>
+        <button id="ai-players" class="btn gradient-btn">Play vs AI</button>
       </div>
+
+      <!-- Difficulty (only for AI) -->
+      <div id="difficulty-container" class="hide fade-transition">
+        <label for="difficulty">Difficulty:</label>
+        <select id="difficulty" class="btn drop-select">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="hard">Hard</option>
+        </select>
+      </div>
+
+      <!-- Dark/Light mode toggle -->
+      <button id="theme-toggle-btn" class="btn theme-btn">Light Mode</button>
     </section>
 
-    <!-- Formulário para inserir nomes -->
-    <!-- Será exibido após escolher 2 players ou IA -->
-    <section id="name-form" class="card hide">
+    <!-- Name form -->
+    <section id="name-form" class="card glassy hide fade-transition">
       <h2>Enter Player Names</h2>
       
-      <!-- Inputs para 2 Players -->
-      <div id="two-players-inputs" class="hide">
-        <label>
-          Player 1 name:
-          <input type="text" id="player1-input" placeholder="Ex: Alice" />
+      <div id="two-players-inputs" class="hide fade-transition">
+        <label>Player 1 name:
+          <input type="text" id="player1-input" placeholder="Ex: Pablo" />
         </label>
-        <label>
-          Player 2 name:
-          <input type="text" id="player2-input" placeholder="Ex: Bob" />
+        <label>Player 2 name:
+          <input type="text" id="player2-input" placeholder="Ex: Satoshi" />
         </label>
       </div>
 
-      <!-- Inputs para 1 Player vs AI -->
-      <div id="ai-inputs" class="hide">
-        <label>
-          Player name:
-          <input type="text" id="player1-ai-input" placeholder="Ex: Alice" />
+      <div id="ai-inputs" class="hide fade-transition">
+        <label>Player name:
+          <input type="text" id="player1-ai-input" placeholder="Ex: Pablo" />
         </label>
       </div>
 
-      <button id="start-game-btn" class="btn">Start Game</button>
+      <div id="best-of-container">
+        <label for="bestOfSelect">Best of:</label>
+        <select id="bestOfSelect" class="btn drop-select">
+          <option value="1">1 (Single Round)</option>
+          <option value="3" selected>3</option>
+          <option value="5">5</option>
+          <option value="7">7</option>
+        </select>
+      </div>
+
+      <button id="start-game-btn" class="btn gradient-btn">Start Game</button>
     </section>
 
-    <!-- Container do jogo (tabuleiro + placar), inicialmente oculto -->
-    <section id="container" class="card hide">
-      <!-- Tabuleiro 3x3 -->
-      <div id="board">
+    <!-- Main game container -->
+    <section id="container" class="card glassy hide fade-transition">
+      <div class="section-title">
+        <h2>Play your match</h2>
+      </div>
+
+      <div id="board" class="game-board">
         <div class="box" id="block-1"></div>
         <div class="box" id="block-2"></div>
         <div class="box" id="block-3"></div>
@@ -63,9 +83,8 @@
         <div class="box" id="block-9"></div>
       </div>
 
-      <!-- Placar -->
-      <div id="scoreboard-container">
-        <h3>Score</h3>
+      <div id="scoreboard-container" class="score-panel">
+        <h3>Score (Best of <span id="bestOfDisplay">3</span>)</h3>
         <div class="score-box">
           <span id="player1-name">Player 1</span> : 
           <span id="x-scoreboard-1">0</span>
@@ -77,22 +96,29 @@
       </div>
     </section>
 
-    <!-- Símbolos X e O “ocultos” para clonar -->
+    <!-- Hidden symbols to clone -->
     <div class="hide">
       <div class="x">X</div>
       <div class="o"></div>
     </div>
   </main>
 
-  <!-- Modal de resultado (vencedor/empate) -->
+  <!-- Modal result -->
   <div id="message-modal" class="modal hide">
-    <div class="modal-content">
-      <p id="modal-text">Mensagem</p>
-      <button id="close-modal-btn" class="btn">Ok</button>
+    <div class="modal-content glassy">
+      <p id="modal-text">Message</p>
+      <button id="rematch-btn" class="btn gradient-btn">Rematch</button>
     </div>
   </div>
 
-  <!-- Script principal -->
+  <footer class="footer-minimal">
+    <p>© 2024 - Tic-Tac-Toe</p>
+    <nav>
+      <a href="#https://www.linkedin.com/in/pablo-santos-46794a269/">Linkedin</a> | 
+      <a href="#https://github.com/pablosantos">Github</a>
+    </nav>
+  </footer>
+
   <script src="js/scripts.js"></script>
 </body>
 </html>

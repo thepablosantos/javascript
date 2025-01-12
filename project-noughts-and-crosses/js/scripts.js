@@ -1,285 +1,408 @@
-// Seleciona símbolos X e O “ocultos” para clonar
-let x = document.querySelector(".x");
-let o = document.querySelector(".o");
+// Clones for X and O
+const x = document.querySelector(".x");
+const o = document.querySelector(".o");
 
-// Seleciona TODAS as boxes
-let boxes = document.querySelectorAll(".box");
+// All board boxes
+const boxes = document.querySelectorAll(".box");
 
-// Botões do menu inicial
+// Mode selection buttons
 const twoPlayersBtn = document.getElementById("two-players");
 const aiPlayersBtn = document.getElementById("ai-players");
 
-// Seção de formulário de nomes
+// Difficulty container (only shown for AI)
+const difficultyContainer = document.getElementById("difficulty-container");
+const difficultySelect = document.getElementById("difficulty");
+
+// Name form
 const nameFormSection = document.getElementById("name-form");
 const twoPlayersInputs = document.getElementById("two-players-inputs");
 const aiInputs = document.getElementById("ai-inputs");
 const startGameBtn = document.getElementById("start-game-btn");
 
-// Inputs
+// Name inputs
 const player1Input = document.getElementById("player1-input");
 const player2Input = document.getElementById("player2-input");
 const player1AiInput = document.getElementById("player1-ai-input");
 
-// Container do jogo
+// Game container
 const containerSection = document.getElementById("container");
 
-// Placar
-let player1NameElem = document.getElementById("player1-name");
-let player2NameElem = document.getElementById("player2-name");
-let xScoreDisplay = document.getElementById("x-scoreboard-1");
-let oScoreDisplay = document.getElementById("o-scoreboard-1");
+// Scoreboard
+const player1NameElem = document.getElementById("player1-name");
+const player2NameElem = document.getElementById("player2-name");
+const xScoreDisplay = document.getElementById("x-scoreboard-1");
+const oScoreDisplay = document.getElementById("o-scoreboard-1");
 let xScore = 0;
 let oScore = 0;
 
-// Mensagem (modal)
+// Best of X
+const bestOfSelect = document.getElementById("bestOfSelect");
+const bestOfDisplay = document.getElementById("bestOfDisplay");
+let bestOf = 3;
+let roundsNeeded = Math.ceil(bestOf / 2);
+
+// Modal
 const modal = document.getElementById("message-modal");
 const modalText = document.getElementById("modal-text");
-const closeModalBtn = document.getElementById("close-modal-btn");
+const rematchBtn = document.getElementById("rematch-btn");
 
-// Variáveis de estado
-let secondPlayer = "";       // "human" ou "ai"
-let player1 = 0;            // contagem de jogadas X
-let player2 = 0;            // contagem de jogadas O
+// Theme toggle
+const themeToggleBtn = document.getElementById("theme-toggle-btn");
+
+// State
+let secondPlayer = ""; // 'human' or 'ai'
+let difficulty = "easy";
+let player1 = 0; // moves count for X
+let player2 = 0; // moves count for O
 let playerOneName = "Player 1";
 let playerTwoName = "Player 2";
 
-/* =========================
-   EVENTOS DE ESCOLHA DE MODO
-   ========================= */
-twoPlayersBtn.addEventListener("click", function () {
-  // Modo 2 players
+/* Toggle fade-in: hide => show (with .fade-transition) */
+function fadeIn(element) {
+  element.classList.remove("hide");
+  element.classList.add("show");
+}
+function fadeOut(element) {
+  element.classList.remove("show");
+  element.classList.add("hide");
+}
+
+// Event: click "2 Players"
+twoPlayersBtn.addEventListener("click", () => {
   secondPlayer = "human";
-  // Mostra formulário de nomes
-  nameFormSection.classList.remove("hide");
-  // Mostra inputs de 2 players
-  twoPlayersInputs.classList.remove("hide");
-  aiInputs.classList.add("hide");
+
+  fadeOut(difficultyContainer);
+  fadeIn(nameFormSection);
+  fadeIn(twoPlayersInputs);
+  fadeOut(aiInputs);
 });
 
-aiPlayersBtn.addEventListener("click", function () {
-  // Modo AI
+// Event: click "Play vs AI"
+aiPlayersBtn.addEventListener("click", () => {
   secondPlayer = "ai";
-  // Mostra formulário de nomes
-  nameFormSection.classList.remove("hide");
-  // Mostra inputs de AI
-  aiInputs.classList.remove("hide");
-  twoPlayersInputs.classList.add("hide");
+
+  fadeIn(difficultyContainer);
+  fadeIn(nameFormSection);
+  fadeIn(aiInputs);
+  fadeOut(twoPlayersInputs);
 });
 
-/* =========================
-   EVENTO DE "START GAME"
-   ========================= */
-startGameBtn.addEventListener("click", function () {
-  // Lê os nomes do(s) campo(s)
+/* Best of selection */
+bestOfSelect.addEventListener("change", () => {
+  bestOf = parseInt(bestOfSelect.value);
+  roundsNeeded = Math.ceil(bestOf / 2);
+});
+
+/* Start game */
+startGameBtn.addEventListener("click", () => {
   if (secondPlayer === "human") {
     playerOneName = player1Input.value.trim() || "Player 1";
     playerTwoName = player2Input.value.trim() || "Player 2";
   } else {
     playerOneName = player1AiInput.value.trim() || "Player 1";
-    playerTwoName = "AI"; // Nome fixo para AI
+    playerTwoName = "AI";
   }
+  difficulty = difficultySelect.value;
 
-  // Atualiza placar com nomes
   player1NameElem.textContent = playerOneName;
   player2NameElem.textContent = playerTwoName;
+  bestOfDisplay.textContent = bestOf;
 
-  // Esconde o formulário e tela inicial
-  nameFormSection.classList.add("hide");
-  
-  // Exibe container do jogo
-  containerSection.classList.remove("hide");
+  loadScore();
+
+  fadeOut(nameFormSection);
+  fadeIn(containerSection);
 });
 
-/* =========================
-   EVENTOS DE CLIQUE NO TABULEIRO
-   ========================= */
-for (let i = 0; i < boxes.length; i++) {
-  boxes[i].addEventListener("click", function () {
-    // Verifica se a box está vazia
-    if (this.childNodes.length == 0) {
+/* Theme toggle: dark => light => dark */
+themeToggleBtn.addEventListener("click", () => {
+  const bodyElem = document.body;
+  if (bodyElem.classList.contains("dark-mode")) {
+    bodyElem.classList.remove("dark-mode");
+    bodyElem.classList.add("light-mode");
+    themeToggleBtn.textContent = "Dark Mode";
+  } else if (bodyElem.classList.contains("light-mode")) {
+    bodyElem.classList.remove("light-mode");
+    bodyElem.classList.add("dark-mode");
+    themeToggleBtn.textContent = "Light Mode";
+  } else {
+    // default if none is set
+    bodyElem.classList.add("light-mode");
+    themeToggleBtn.textContent = "Dark Mode";
+  }
+});
+
+/* Box click events */
+boxes.forEach((box) => {
+  box.addEventListener("click", () => {
+    if (box.childNodes.length === 0) {
       let el = checkEl(player1, player2);
       let cloneEl = el.cloneNode(true);
+      box.appendChild(cloneEl);
 
-      this.appendChild(cloneEl);
-
-      // Incrementa contador para alternar jogador
-      if (player1 == player2) {
+      if (player1 === player2) {
         player1++;
       } else {
         player2++;
       }
 
-      // Checa se alguém ganhou ou empatou
       checkWinCondition();
 
-      // Se for modo AI e ainda não houve vitória, IA faz jogada
       if (secondPlayer === "ai" && (player1 > player2)) {
-        aiPlay();
+        setTimeout(aiPlay, 300);
       }
     }
   });
+});
+
+/* Decide if next is X or O */
+function checkEl(p1, p2) {
+  return p1 === p2 ? x : o;
 }
 
-/* =========================
-   FUNÇÃO PARA DETERMINAR SE O PRÓXIMO SÍMBOLO É X OU O
-   ========================= */
-function checkEl(player1, player2) {
-  if (player1 == player2) {
-    // X
-    return x;
-  } else {
-    // O
-    return o;
-  }
-}
-
-/* =========================
-   FUNÇÃO DE LÓGICA PARA “IA” SIMPLES
-   ========================= */
+/* AI logic */
 function aiPlay() {
-  // Procura todas as boxes vazias
-  let emptyBoxes = [];
-  for (let i = 0; i < boxes.length; i++) {
-    if (boxes[i].childNodes.length == 0) {
-      emptyBoxes.push(boxes[i]);
-    }
+  if (difficulty === "easy") {
+    aiEasy();
+  } else if (difficulty === "medium") {
+    aiMedium();
+  } else {
+    aiHard();
   }
+  checkWinCondition();
+}
 
-  if (emptyBoxes.length > 0) {
-    // Escolhe uma box aleatória
-    let randomIndex = Math.floor(Math.random() * emptyBoxes.length);
-    let box = emptyBoxes[randomIndex];
-
-    // Clona o O
-    let cloneO = o.cloneNode(true);
-    box.appendChild(cloneO);
-
-    // Contador de jogadas
+/* AI - easy */
+function aiEasy() {
+  let empty = Array.from(boxes).filter(b => b.childNodes.length === 0);
+  if (empty.length > 0) {
+    let rnd = Math.floor(Math.random() * empty.length);
+    empty[rnd].appendChild(o.cloneNode(true));
     player2++;
-
-    // Checa novamente vitória/empate
-    checkWinCondition();
   }
 }
 
-/* =========================
-   FUNÇÃO QUE VERIFICA VITÓRIA OU EMPATE
-   ========================= */
-function checkWinCondition() {
-  // Obtém cada célula do tabuleiro
-  let b1 = document.getElementById("block-1");
-  let b2 = document.getElementById("block-2");
-  let b3 = document.getElementById("block-3");
-  let b4 = document.getElementById("block-4");
-  let b5 = document.getElementById("block-5");
-  let b6 = document.getElementById("block-6");
-  let b7 = document.getElementById("block-7");
-  let b8 = document.getElementById("block-8");
-  let b9 = document.getElementById("block-9");
-
-  // Função auxiliar para pegar 'x' ou 'o'
-  function getBoxClass(box) {
-    if (box.childNodes.length > 0) {
-      return box.childNodes[0].className;
-    }
-    return "";
+/* AI - medium */
+function aiMedium() {
+  if (tryBlockWin()) {
+    player2++;
+  } else {
+    aiEasy();
   }
+}
 
-  let b1Child = getBoxClass(b1);
-  let b2Child = getBoxClass(b2);
-  let b3Child = getBoxClass(b3);
-  let b4Child = getBoxClass(b4);
-  let b5Child = getBoxClass(b5);
-  let b6Child = getBoxClass(b6);
-  let b7Child = getBoxClass(b7);
-  let b8Child = getBoxClass(b8);
-  let b9Child = getBoxClass(b9);
-
-  // Array de possíveis combinações que geram vitória
-  let combos = [
-    // Linhas
-    [b1Child, b2Child, b3Child],
-    [b4Child, b5Child, b6Child],
-    [b7Child, b8Child, b9Child],
-    // Colunas
-    [b1Child, b4Child, b7Child],
-    [b2Child, b5Child, b8Child],
-    [b3Child, b6Child, b9Child],
-    // Diagonais
-    [b1Child, b5Child, b9Child],
-    [b3Child, b5Child, b7Child]
-  ];
-
-  // Verifica se alguma combinação é só 'x' ou só 'o'
-  for (let combo of combos) {
-    if (combo[0] === 'x' && combo[1] === 'x' && combo[2] === 'x') {
-      // X venceu
-      declareWinner('x');
-      return;
-    } else if (combo[0] === 'o' && combo[1] === 'o' && combo[2] === 'o') {
-      // O venceu
-      declareWinner('o');
-      return;
+/* Try to block two X in a row */
+function tryBlockWin() {
+  let combos = getCombos();
+  for (let i = 0; i < combos.length; i++) {
+    let combo = combos[i];
+    let countX = combo.filter(c => c === "x").length;
+    let countO = combo.filter(c => c === "o").length;
+    if (countX === 2 && countO === 0) {
+      let emptyIndex = combo.indexOf("");
+      if (emptyIndex >= 0) {
+        let blockId = getComboBlockIds(i)[emptyIndex];
+        let blockElem = document.getElementById(blockId);
+        if (blockElem && blockElem.childNodes.length === 0) {
+          blockElem.appendChild(o.cloneNode(true));
+          return true;
+        }
+      }
     }
   }
+  return false;
+}
 
-  // Se ninguém ganhou, verifica se deu empate
-  let filled = 0;
+/* AI - hard (simple minimax) */
+function aiHard() {
+  let bestScore = -Infinity;
+  let moveIndex = null;
+
   for (let i = 0; i < boxes.length; i++) {
-    if (boxes[i].childNodes.length > 0) {
-      filled++;
+    if (boxes[i].childNodes.length === 0) {
+      boxes[i].appendChild(o.cloneNode(true));
+      let score = miniMax(false);
+      boxes[i].innerHTML = "";
+      if (score > bestScore) {
+        bestScore = score;
+        moveIndex = i;
+      }
     }
   }
-  if (filled === 9) {
-    // Empate
-    declareWinner('draw');
+
+  if (moveIndex !== null) {
+    boxes[moveIndex].appendChild(o.cloneNode(true));
+    player2++;
   }
 }
 
-/* =========================
-   TRATA VENCEDOR OU EMPATE
-   ========================= */
+/* Simple minimax */
+function miniMax(isMaximizing) {
+  let result = checkImmediateWin();
+  if (result !== null) {
+    if (result === "o") return 10;
+    if (result === "x") return -10;
+    if (result === "draw") return 0;
+  }
+
+  if (isMaximizing) {
+    let bestScore = -Infinity;
+    for (let i = 0; i < boxes.length; i++) {
+      if (boxes[i].childNodes.length === 0) {
+        boxes[i].appendChild(o.cloneNode(true));
+        let score = miniMax(false);
+        boxes[i].innerHTML = "";
+        if (score > bestScore) bestScore = score;
+      }
+    }
+    return bestScore;
+  } else {
+    let bestScore = Infinity;
+    for (let i = 0; i < boxes.length; i++) {
+      if (boxes[i].childNodes.length === 0) {
+        boxes[i].appendChild(x.cloneNode(true));
+        let score = miniMax(true);
+        boxes[i].innerHTML = "";
+        if (score < bestScore) bestScore = score;
+      }
+    }
+    return bestScore;
+  }
+}
+
+/* Check immediate win or draw */
+function checkImmediateWin() {
+  let combos = getCombos();
+  for (let c of combos) {
+    if (c.every(v => v === "x")) return "x";
+    if (c.every(v => v === "o")) return "o";
+  }
+  let filled = Array.from(boxes).filter(b => b.childNodes.length > 0).length;
+  if (filled === 9) return "draw";
+  return null;
+}
+
+/* Generate combos (3x3) */
+function getCombos() {
+  let b = [...Array(9)].map((_, i) => getChildClass(document.getElementById(`block-${i+1}`)));
+  return [
+    [b[0], b[1], b[2]],
+    [b[3], b[4], b[5]],
+    [b[6], b[7], b[8]],
+    [b[0], b[3], b[6]],
+    [b[1], b[4], b[7]],
+    [b[2], b[5], b[8]],
+    [b[0], b[4], b[8]],
+    [b[2], b[4], b[6]],
+  ];
+}
+
+/* Map combo index to actual block IDs */
+function getComboBlockIds(i) {
+  let combosIds = [
+    ["block-1","block-2","block-3"],
+    ["block-4","block-5","block-6"],
+    ["block-7","block-8","block-9"],
+    ["block-1","block-4","block-7"],
+    ["block-2","block-5","block-8"],
+    ["block-3","block-6","block-9"],
+    ["block-1","block-5","block-9"],
+    ["block-3","block-5","block-7"],
+  ];
+  return combosIds[i];
+}
+
+function getChildClass(elem) {
+  if (elem.childNodes.length > 0) {
+    return elem.childNodes[0].className;
+  }
+  return "";
+}
+
+/* Check if there's a winner */
+function checkWinCondition() {
+  let combos = getCombos();
+  for (let combo of combos) {
+    if (combo.every(c => c === "x")) {
+      declareWinner("x");
+      return;
+    } else if (combo.every(c => c === "o")) {
+      declareWinner("o");
+      return;
+    }
+  }
+  let filled = Array.from(boxes).filter(b => b.childNodes.length > 0).length;
+  if (filled === 9) {
+    declareWinner("draw");
+  }
+}
+
+/* Declare winner or draw */
 function declareWinner(winner) {
-  if (winner === 'x') {
+  let msg = "";
+  if (winner === "x") {
     xScore++;
     xScoreDisplay.textContent = xScore;
-    showMessage(`${playerOneName} venceu!`);
-  } else if (winner === 'o') {
+    msg = `${playerOneName} venceu!`;
+  } else if (winner === "o") {
     oScore++;
     oScoreDisplay.textContent = oScore;
-    showMessage(`${playerTwoName} venceu!`);
+    msg = `${playerTwoName} venceu!`;
   } else {
-    showMessage("Empate!");
+    msg = "Empate!";
+  }
+  modalText.textContent = msg;
+  modal.classList.remove("hide");
+  saveScore();
+
+  if (xScore >= roundsNeeded || oScore >= roundsNeeded) {
+    // match over if needed
   }
 }
 
-/* =========================
-   MOSTRA MENSAGEM (USANDO MODAL)
-   ========================= */
-function showMessage(msg) {
-  modalText.textContent = msg;
-  // Exibe o modal
-  modal.classList.remove("hide");
-}
-
-/* =========================
-   FECHAR MODAL
-   ========================= */
-closeModalBtn.addEventListener("click", function () {
-  // Fecha modal
+/* Rematch click */
+rematchBtn.addEventListener("click", () => {
   modal.classList.add("hide");
-  // Limpa o tabuleiro para a próxima partida
   resetBoard();
 });
 
-/* =========================
-   REINICIA O TABULEIRO
-   ========================= */
+/* Reset the board for next round */
 function resetBoard() {
-  for (let i = 0; i < boxes.length; i++) {
-    boxes[i].innerHTML = ""; // Remove X ou O
-  }
-  // Zera contadores de jogada
+  boxes.forEach(b => b.innerHTML = "");
   player1 = 0;
   player2 = 0;
+}
+
+/* Save/Load scoreboard from localStorage */
+function saveScore() {
+  let data = {
+    playerOneName: playerOneName,
+    playerTwoName: playerTwoName,
+    xScore: xScore,
+    oScore: oScore,
+    bestOf: bestOf
+  };
+  localStorage.setItem("tictactoeScore", JSON.stringify(data));
+}
+
+function loadScore() {
+  let saved = localStorage.getItem("tictactoeScore");
+  if (saved) {
+    let data = JSON.parse(saved);
+    if (
+      data.playerOneName === playerOneName &&
+      data.playerTwoName === playerTwoName &&
+      data.bestOf === bestOf
+    ) {
+      xScore = data.xScore;
+      oScore = data.oScore;
+      xScoreDisplay.textContent = xScore;
+      oScoreDisplay.textContent = oScore;
+    } else {
+      xScore = 0;
+      oScore = 0;
+      xScoreDisplay.textContent = 0;
+      oScoreDisplay.textContent = 0;
+    }
+  }
 }

@@ -2,45 +2,92 @@
 let x = document.querySelector(".x");
 let o = document.querySelector(".o");
 
-// Seleciona TODAS as boxes (NodeList)
+// Seleciona TODAS as boxes
 let boxes = document.querySelectorAll(".box");
 
-// Botões do menu
+// Botões do menu inicial
 const twoPlayersBtn = document.getElementById("two-players");
 const aiPlayersBtn = document.getElementById("ai-players");
 
-// Mensagem de resultado
-let messageContainer = document.getElementById("message");
-let messageText = document.querySelector("#message p");
+// Seção de formulário de nomes
+const nameFormSection = document.getElementById("name-form");
+const twoPlayersInputs = document.getElementById("two-players-inputs");
+const aiInputs = document.getElementById("ai-inputs");
+const startGameBtn = document.getElementById("start-game-btn");
+
+// Inputs
+const player1Input = document.getElementById("player1-input");
+const player2Input = document.getElementById("player2-input");
+const player1AiInput = document.getElementById("player1-ai-input");
+
+// Container do jogo
+const containerSection = document.getElementById("container");
 
 // Placar
+let player1NameElem = document.getElementById("player1-name");
+let player2NameElem = document.getElementById("player2-name");
 let xScoreDisplay = document.getElementById("x-scoreboard-1");
 let oScoreDisplay = document.getElementById("o-scoreboard-1");
 let xScore = 0;
 let oScore = 0;
 
-// Controla se o segundo player é humano ou AI
-let secondPlayer = "";
+// Mensagem (modal)
+const modal = document.getElementById("message-modal");
+const modalText = document.getElementById("modal-text");
+const closeModalBtn = document.getElementById("close-modal-btn");
 
-// Contador de jogadas
-let player1 = 0;
-let player2 = 0;
+// Variáveis de estado
+let secondPlayer = "";       // "human" ou "ai"
+let player1 = 0;            // contagem de jogadas X
+let player2 = 0;            // contagem de jogadas O
+let playerOneName = "Player 1";
+let playerTwoName = "Player 2";
 
 /* =========================
    EVENTOS DE ESCOLHA DE MODO
    ========================= */
 twoPlayersBtn.addEventListener("click", function () {
+  // Modo 2 players
   secondPlayer = "human";
-
-  // Mostra container do jogo, remove a classe .hide
-  document.getElementById("container").classList.remove("hide");
+  // Mostra formulário de nomes
+  nameFormSection.classList.remove("hide");
+  // Mostra inputs de 2 players
+  twoPlayersInputs.classList.remove("hide");
+  aiInputs.classList.add("hide");
 });
 
 aiPlayersBtn.addEventListener("click", function () {
+  // Modo AI
   secondPlayer = "ai";
+  // Mostra formulário de nomes
+  nameFormSection.classList.remove("hide");
+  // Mostra inputs de AI
+  aiInputs.classList.remove("hide");
+  twoPlayersInputs.classList.add("hide");
+});
 
-  // Mostra container do jogo, remove a classe .hide
-  document.getElementById("container").classList.remove("hide");
+/* =========================
+   EVENTO DE "START GAME"
+   ========================= */
+startGameBtn.addEventListener("click", function () {
+  // Lê os nomes do(s) campo(s)
+  if (secondPlayer === "human") {
+    playerOneName = player1Input.value.trim() || "Player 1";
+    playerTwoName = player2Input.value.trim() || "Player 2";
+  } else {
+    playerOneName = player1AiInput.value.trim() || "Player 1";
+    playerTwoName = "AI"; // Nome fixo para AI
+  }
+
+  // Atualiza placar com nomes
+  player1NameElem.textContent = playerOneName;
+  player2NameElem.textContent = playerTwoName;
+
+  // Esconde o formulário e tela inicial
+  nameFormSection.classList.add("hide");
+  
+  // Exibe container do jogo
+  containerSection.classList.remove("hide");
 });
 
 /* =========================
@@ -130,7 +177,7 @@ function checkWinCondition() {
   let b8 = document.getElementById("block-8");
   let b9 = document.getElementById("block-9");
 
-  // Função auxiliar para pegar 'x' ou 'o' de uma célula
+  // Função auxiliar para pegar 'x' ou 'o'
   function getBoxClass(box) {
     if (box.childNodes.length > 0) {
       return box.childNodes[0].className;
@@ -177,13 +224,13 @@ function checkWinCondition() {
   }
 
   // Se ninguém ganhou, verifica se deu empate
-  let counter = 0;
+  let filled = 0;
   for (let i = 0; i < boxes.length; i++) {
     if (boxes[i].childNodes.length > 0) {
-      counter++;
+      filled++;
     }
   }
-  if (counter === 9) {
+  if (filled === 9) {
     // Empate
     declareWinner('draw');
   }
@@ -196,32 +243,34 @@ function declareWinner(winner) {
   if (winner === 'x') {
     xScore++;
     xScoreDisplay.textContent = xScore;
-    showMessage("X venceu!");
+    showMessage(`${playerOneName} venceu!`);
   } else if (winner === 'o') {
     oScore++;
     oScoreDisplay.textContent = oScore;
-    showMessage("O venceu!");
+    showMessage(`${playerTwoName} venceu!`);
   } else {
     showMessage("Empate!");
   }
-
-  // Limpa o tabuleiro para a próxima partida
-  resetBoard();
 }
 
 /* =========================
-   MOSTRA MENSAGEM CENTRAL
+   MOSTRA MENSAGEM (USANDO MODAL)
    ========================= */
 function showMessage(msg) {
-  messageText.textContent = msg;
-  // Exibe p dentro de #message
-  messageText.style.display = "block";
-
-  // Depois de 1.5s, esconde a mensagem novamente
-  setTimeout(() => {
-    messageText.style.display = "none";
-  }, 1500);
+  modalText.textContent = msg;
+  // Exibe o modal
+  modal.classList.remove("hide");
 }
+
+/* =========================
+   FECHAR MODAL
+   ========================= */
+closeModalBtn.addEventListener("click", function () {
+  // Fecha modal
+  modal.classList.add("hide");
+  // Limpa o tabuleiro para a próxima partida
+  resetBoard();
+});
 
 /* =========================
    REINICIA O TABULEIRO

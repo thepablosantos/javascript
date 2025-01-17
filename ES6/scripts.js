@@ -48,3 +48,19 @@ const shirt = new Product ('Camisa gola v', 20)
 console.log(shirt.name)
 
 console.log(shirt.productWithDiscount(10))
+
+// 9 herenca
+
+class ProductWithAttributes extends Product {
+    constructor(name, price, colors) {
+        super(name, price)
+        this.colors = colors
+    }
+
+    showColors() {
+        console.log("As cores são:")
+        this.colors.forEach((color) => {
+            console.log(color)
+        })
+    }
+}

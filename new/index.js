@@ -1,7 +1,19 @@
-const pontuacaoUsuario = 999;
-const nivelUsuario = pontuacaoUsuario >= 1000 ? 'Usário VIP' : 'Usuário normal';
+let now = new Date();
 
-const corUsuario = null;
-const corPadrao = corUsuario || 'Preta';
+const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
 
-console.log(nivelUsuario, corPadrao);
+let data = {
+    dia: now.getDate(),
+    mes: nomesMeses[now.getMonth()],
+    ano: now.getFullYear(),
+    hora: now.getHours(),
+    min: now.getMinutes(),
+    seg: now.getSeconds(),
+}
+
+function dia(data) {
+    return `Dia: ${data.dia}, Mês: ${data.mes}, Ano: ${data.ano}`;
+}
+
+console.log(dia(data));

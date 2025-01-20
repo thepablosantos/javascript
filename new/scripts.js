@@ -4,6 +4,8 @@ const pessoa = {
     idade: 31
 };
 
-for (let i in pessoa) {
-    console.log(pessoa[i]);
+
+
+for (let chave in pessoa) {
+    console.log(chave, pessoa[chave]);
 }

@@ -5,6 +5,7 @@ function rand(min = 1000, max = 3000) {
 function f1() {
     setTimeout(function() {
         console.log('f1');
+        if (callback) callback();
     }, rand());
 }
 
@@ -15,6 +16,9 @@ function f2() {
     
 }
 
-f1();
+f1(function() {
+    f2();
+});
+
 f2();
 console.log('Hello World!');
